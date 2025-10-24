@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>抢红包游戏</title>
+    <title>群聊抢红包游戏</title>
     <style>
         * {
             margin: 0;
@@ -15,22 +15,24 @@
             font-family: 'Microsoft YaHei', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            padding: 20px;
+            overflow-x: hidden;
         }
 
-        .game-container {
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
             text-align: center;
-            position: relative;
-            z-index: 1;
+            color: #fff;
+            margin-bottom: 2rem;
         }
 
-        .title {
-            color: #fff;
+        .header h1 {
             font-size: 2.5rem;
-            margin-bottom: 3rem;
+            margin-bottom: 1rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
             animation: pulse 2s ease-in-out infinite;
         }
@@ -40,204 +42,57 @@
             50% { transform: scale(1.05); }
         }
 
-        .red-packet-wrapper {
-            position: relative;
-            display: inline-block;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .red-packet-wrapper:hover {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .red-packet-wrapper.shake {
-            animation: shake 0.5s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0) rotate(0deg); }
-            25% { transform: translateX(-10px) rotate(-5deg); }
-            75% { transform: translateX(10px) rotate(5deg); }
-        }
-
-        .red-packet {
-            width: 200px;
-            height: 240px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        /* 游戏设置面板 */
+        .setup-panel {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
             border-radius: 20px;
-            position: relative;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .setup-panel h2 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-field label {
+            color: #555;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .input-field input {
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
             transition: all 0.3s ease;
         }
 
-        .red-packet::before {
-            content: '';
-            position: absolute;
-            top: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 60px;
-            background: #ffd700;
-            border-radius: 50%;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        .input-field input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .red-packet::after {
-            content: '恭喜发财';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ffd700;
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .packet-top {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 50px;
-            background: linear-gradient(135deg, #ff8e53 0%, #fe6b8b 100%);
-            border-radius: 20px 20px 0 0;
-            z-index: 2;
-            transition: all 0.5s ease;
-        }
-
-        .red-packet-wrapper.opening .packet-top {
-            transform: translateY(-60px) rotateX(45deg);
-            opacity: 0;
-        }
-
-        .red-packet-wrapper.opening .red-packet {
-            animation: openPacket 0.5s ease forwards;
-        }
-
-        @keyframes openPacket {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1.1); opacity: 0.5; }
-        }
-
-        /* 金币动画 */
-        .coin {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            border-radius: 50%;
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.6);
-            opacity: 0;
-            z-index: 10;
-        }
-
-        .coin::before {
-            content: '¥';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ff6b6b;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        @keyframes coinFly {
-            0% {
-                opacity: 1;
-                transform: translate(0, 0) scale(0);
-            }
-            50% {
-                opacity: 1;
-                transform: translate(var(--tx), var(--ty)) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(var(--tx), calc(var(--ty) + 100px)) scale(0.5);
-            }
-        }
-
-        /* 结果弹窗 */
-        .result-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .result-modal.show {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .result-content {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-            padding: 3rem 2rem;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            animation: scaleIn 0.4s ease;
-            max-width: 400px;
-            width: 90%;
-        }
-
-        @keyframes scaleIn {
-            from { 
-                transform: scale(0.5);
-                opacity: 0;
-            }
-            to { 
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .result-title {
-            color: #ffd700;
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .result-amount {
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
-            font-size: 3.5rem;
-            font-weight: bold;
-            margin: 1.5rem 0;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
-            animation: numberPop 0.6s ease;
-        }
-
-        @keyframes numberPop {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
-        .result-message {
-            color: #fff;
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-
-        .btn {
-            background: #ffd700;
-            color: #ff6b6b;
             border: none;
             padding: 1rem 3rem;
             font-size: 1.2rem;
@@ -245,224 +100,771 @@
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            width: 100%;
         }
 
-        .btn:hover {
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
         }
 
-        .btn:active {
-            transform: translateY(0);
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        /* 统计信息 */
-        .stats {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255,255,255,0.2);
+        /* 游戏主区域 */
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 968px) {
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 聊天区域 */
+        .chat-container {
+            background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
+            border-radius: 20px;
             padding: 1.5rem;
-            border-radius: 15px;
-            color: #fff;
-            text-align: left;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            height: 600px;
+            display: flex;
+            flex-direction: column;
         }
 
-        .stats h3 {
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e0e0e0;
             margin-bottom: 1rem;
+        }
+
+        .chat-header h3 {
+            color: #667eea;
+            font-size: 1.3rem;
+        }
+
+        .group-badge {
+            background: #667eea;
+            color: #fff;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.system {
+            text-align: center;
+            color: #999;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+        }
+
+        .message.user .message-content {
+            background: #fff;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            margin-right: 0.8rem;
+        }
+
+        .username {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .red-packet-msg {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            padding: 1rem;
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .red-packet-msg:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.5);
+        }
+
+        .red-packet-msg.opened {
+            background: linear-gradient(135deg, #ccc 0%, #999 100%);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .packet-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .packet-title {
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .packet-info {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .grab-result {
+            background: #fff3cd;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            border-left: 4px solid #ffc107;
+        }
+
+        .grab-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin: 0.5rem 0;
+        }
+
+        /* 信息面板 */
+        .info-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .info-card h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #666;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-value.highlight {
+            color: #ff6b6b;
             font-size: 1.2rem;
         }
 
-        .stats p {
-            margin: 0.5rem 0;
+        /* 最终结果面板 */
+        .result-panel {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+            animation: scaleIn 0.4s ease;
+        }
+
+        .result-panel.show {
+            display: block;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .result-panel h2 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+
+        .winners {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .winner-card {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .winner-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .winner-card.best::before {
+            background: linear-gradient(90deg, #ffd700 0%, #ff6b6b 100%);
+        }
+
+        .winner-card.worst::before {
+            background: linear-gradient(90deg, #95a5a6 0%, #7f8c8d 100%);
+        }
+
+        .winner-badge {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .winner-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .winner-amount {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin: 1rem 0;
+        }
+
+        .winner-name {
+            color: #666;
             font-size: 1rem;
         }
 
-        /* 背景粒子效果 */
-        .particle {
-            position: absolute;
-            background: rgba(255, 215, 0, 0.6);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: float 4s ease-in-out infinite;
+        .ranking-table {
+            background: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
-            50% { opacity: 1; }
+        .ranking-table table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        .hint {
+        .ranking-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
-            font-size: 1.2rem;
-            margin-top: 2rem;
-            opacity: 0.8;
-            animation: blink 2s ease-in-out infinite;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 0.3; }
+        .ranking-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .ranking-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .ranking-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .rank-medal {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1 class="title">🧧 春节抢红包 🧧</h1>
-        
-        <div class="red-packet-wrapper" id="redPacket">
-            <div class="packet-top"></div>
-            <div class="red-packet"></div>
+    <div class="container">
+        <div class="header">
+            <h1>🧧 群聊抢红包游戏 🧧</h1>
+            <p>模拟真实微信群抢红包场景</p>
         </div>
 
-        <p class="hint">点击红包,试试手气!</p>
-    </div>
+        <!-- 游戏设置 -->
+        <div class="setup-panel" id="setupPanel">
+            <h2>🎮 红包设置</h2>
+            <div class="input-group">
+                <div class="input-field">
+                    <label>红包总金额 (元)</label>
+                    <input type="number" id="totalAmount" value="100" min="1" step="0.01">
+                </div>
+                <div class="input-field">
+                    <label>红包个数 (人)</label>
+                    <input type="number" id="totalCount" value="10" min="2" max="100">
+                </div>
+                <div class="input-field">
+                    <label>你的昵称</label>
+                    <input type="text" id="userName" value="我" maxlength="10">
+                </div>
+            </div>
+            <button class="btn-primary" onclick="startGame()">🚀 发红包</button>
+        </div>
 
-    <div class="stats">
-        <h3>📊 统计信息</h3>
-        <p>已抢次数: <strong><span id="totalCount">0</span></strong></p>
-        <p>累计金额: <strong>¥<span id="totalAmount">0.00</span></strong></p>
-        <p>最大金额: <strong>¥<span id="maxAmount">0.00</span></strong></p>
-    </div>
+        <!-- 游戏区域 -->
+        <div class="game-area hidden" id="gameArea">
+            <!-- 聊天区域 -->
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3>💬 群聊消息</h3>
+                    <span class="group-badge">在线 <span id="onlineCount">10</span>人</span>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                </div>
+            </div>
 
-    <div class="result-modal" id="resultModal">
-        <div class="result-content">
-            <div class="result-title">🎉 恭喜发财 🎉</div>
-            <div class="result-amount">¥<span id="amount">0.00</span></div>
-            <div class="result-message" id="message">大吉大利!</div>
-            <button class="btn" onclick="closeModal()">再抢一个</button>
+            <!-- 信息面板 -->
+            <div class="info-panel">
+                <div class="info-card">
+                    <h3>📊 抢红包进度</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill">0/0</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">总金额</span>
+                        <span class="stat-value">¥<span id="displayTotal">0</span></span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">剩余金额</span>
+                        <span class="stat-value highlight">¥<span id="displayRemaining">0</span></span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">已抢/总数</span>
+                        <span class="stat-value"><span id="displayGrabbed">0</span>/<span id="displayCount">0</span></span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>🎯 你的战绩</h3>
+                    <div class="stat-item">
+                        <span class="stat-label">抢到金额</span>
+                        <span class="stat-value highlight">¥<span id="myAmount">0.00</span></span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">抢到时间</span>
+                        <span class="stat-value"><span id="myRank">-</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最终结果 -->
+        <div class="result-panel" id="resultPanel">
+            <h2>🎊 红包已抢完 🎊</h2>
+            
+            <div class="winners">
+                <div class="winner-card best">
+                    <div class="winner-badge">🏆</div>
+                    <div class="winner-title">手气最佳</div>
+                    <div class="winner-amount">¥<span id="bestAmount">0.00</span></div>
+                    <div class="winner-name"><span id="bestName">-</span></div>
+                </div>
+                <div class="winner-card worst">
+                    <div class="winner-badge">🍀</div>
+                    <div class="winner-title">运气最差</div>
+                    <div class="winner-amount">¥<span id="worstAmount">0.00</span></div>
+                    <div class="winner-name"><span id="worstName">-</span></div>
+                </div>
+            </div>
+
+            <div class="ranking-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>昵称</th>
+                            <th>金额</th>
+                            <th>抢到时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rankingBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <button class="btn-primary" style="margin-top: 2rem;" onclick="resetGame()">🔄 重新开始</button>
         </div>
     </div>
 
     <script>
-        let totalCount = 0;
-        let totalAmount = 0;
-        let maxAmount = 0;
+        let gameState = {
+            totalAmount: 0,
+            totalCount: 0,
+            remainingAmount: 0,
+            remainingCount: 0,
+            packets: [],
+            grabbed: [],
+            userName: '我',
+            currentPacketId: null
+        };
 
-        // 生成背景粒子
-        function createParticles() {
-            for (let i = 0; i < 20; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.width = Math.random() * 10 + 5 + 'px';
-                particle.style.height = particle.style.width;
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 4 + 's';
-                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
-                document.body.appendChild(particle);
+        const botNames = ['小明', '小红', '小刚', '小丽', '大熊', '静香', '胖虎', '小夫', '张三', '李四', 
+                         '王五', '赵六', '钱七', '孙八', '周九', '吴十', '郑一', '冯二', '陈三', '褚四'];
+
+        // 生成随机红包金额（微信红包算法）
+        function generatePackets(total, count) {
+            const packets = [];
+            let remaining = total;
+            
+            for (let i = 0; i < count; i++) {
+                if (i === count - 1) {
+                    packets.push(parseFloat(remaining.toFixed(2)));
+                } else {
+                    const min = 0.01;
+                    const max = (remaining / (count - i)) * 2;
+                    const amount = Math.random() * (max - min) + min;
+                    const finalAmount = parseFloat(amount.toFixed(2));
+                    packets.push(finalAmount);
+                    remaining -= finalAmount;
+                }
             }
-        }
-
-        // 生成随机金额
-        function generateAmount() {
-            const rand = Math.random();
-            if (rand < 0.5) {
-                return (Math.random() * 2 + 0.01).toFixed(2); // 0.01-2元 (50%)
-            } else if (rand < 0.85) {
-                return (Math.random() * 18 + 2).toFixed(2); // 2-20元 (35%)
-            } else if (rand < 0.97) {
-                return (Math.random() * 80 + 20).toFixed(2); // 20-100元 (12%)
-            } else {
-                return (Math.random() * 100 + 100).toFixed(2); // 100-200元 (3%)
+            
+            // 打乱顺序
+            for (let i = packets.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [packets[i], packets[j]] = [packets[j], packets[i]];
             }
+            
+            return packets;
         }
 
-        // 获取祝福语
-        function getMessage(amount) {
-            if (amount >= 100) return '💰 恭喜发大财!手气爆棚!';
-            if (amount >= 50) return '🎊 运气超好!再接再厉!';
-            if (amount >= 10) return '✨ 手气不错!继续加油!';
-            if (amount >= 1) return '🍀 小有收获!祝你好运!';
-            return '🌟 聚沙成塔!下次更好!';
-        }
+        // 开始游戏
+        function startGame() {
+            const total = parseFloat(document.getElementById('totalAmount').value);
+            const count = parseInt(document.getElementById('totalCount').value);
+            const userName = document.getElementById('userName').value || '我';
 
-        // 创建金币动画
-        function createCoins() {
-            const packet = document.getElementById('redPacket');
-            const rect = packet.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-
-            for (let i = 0; i < 15; i++) {
-                const coin = document.createElement('div');
-                coin.className = 'coin';
-                coin.style.left = centerX + 'px';
-                coin.style.top = centerY + 'px';
-                
-                const angle = (Math.PI * 2 * i) / 15;
-                const distance = 150 + Math.random() * 100;
-                const tx = Math.cos(angle) * distance;
-                const ty = Math.sin(angle) * distance;
-                
-                coin.style.setProperty('--tx', tx + 'px');
-                coin.style.setProperty('--ty', ty + 'px');
-                coin.style.animation = `coinFly ${0.8 + Math.random() * 0.4}s ease-out forwards`;
-                coin.style.animationDelay = (Math.random() * 0.2) + 's';
-                
-                document.body.appendChild(coin);
-                
-                setTimeout(() => coin.remove(), 1500);
-            }
-        }
-
-        // 更新统计信息
-        function updateStats(amount) {
-            totalCount++;
-            totalAmount += parseFloat(amount);
-            if (parseFloat(amount) > maxAmount) {
-                maxAmount = parseFloat(amount);
+            if (total < count * 0.01) {
+                alert('总金额太少了！每个红包至少0.01元');
+                return;
             }
 
-            document.getElementById('totalCount').textContent = totalCount;
-            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
-            document.getElementById('maxAmount').textContent = maxAmount.toFixed(2);
+            gameState = {
+                totalAmount: total,
+                totalCount: count,
+                remainingAmount: total,
+                remainingCount: count,
+                packets: generatePackets(total, count),
+                grabbed: [],
+                userName: userName,
+                currentPacketId: Date.now()
+            };
+
+            document.getElementById('setupPanel').classList.add('hidden');
+            document.getElementById('gameArea').classList.remove('hidden');
+            document.getElementById('resultPanel').classList.remove('show');
+
+            updateDisplay();
+            addSystemMessage(`${userName} 发了一个红包`);
+            addRedPacketMessage();
+            
+            // 模拟其他人抢红包
+            simulateBotGrabbing();
         }
 
-        // 打开红包
-        function openRedPacket() {
-            const wrapper = document.getElementById('redPacket');
-            if (wrapper.classList.contains('opening')) return;
+        // 更新显示
+        function updateDisplay() {
+            document.getElementById('displayTotal').textContent = gameState.totalAmount.toFixed(2);
+            document.getElementById('displayRemaining').textContent = gameState.remainingAmount.toFixed(2);
+            document.getElementById('displayGrabbed').textContent = gameState.grabbed.length;
+            document.getElementById('displayCount').textContent = gameState.totalCount;
+            document.getElementById('onlineCount').textContent = gameState.totalCount;
 
-            // 抖动效果
-            wrapper.classList.add('shake');
-            setTimeout(() => wrapper.classList.remove('shake'), 500);
+            const progress = (gameState.grabbed.length / gameState.totalCount) * 100;
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = progress + '%';
+            progressFill.textContent = `${gameState.grabbed.length}/${gameState.totalCount}`;
+        }
 
+        // 添加系统消息
+        function addSystemMessage(text) {
+            const chatMessages = document.getElementById('chatMessages');
+            const message = document.createElement('div');
+            message.className = 'message system';
+            message.textContent = text;
+            chatMessages.appendChild(message);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // 添加红包消息
+        function addRedPacketMessage() {
+            const chatMessages = document.getElementById('chatMessages');
+            const message = document.createElement('div');
+            message.className = 'message user';
+            message.innerHTML = `
+                <div class="message-content">
+                    <div class="message-header">
+                        <div class="avatar">${gameState.userName[0]}</div>
+                        <span class="username">${gameState.userName}</span>
+                    </div>
+                    <div class="red-packet-msg" id="redPacket" onclick="grabPacket()">
+                        <div class="packet-icon">🧧</div>
+                        <div class="packet-title">恭喜发财，大吉大利</div>
+                        <div class="packet-info">共${gameState.totalCount}个红包，金额随机</div>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(message);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // 抢红包
+        function grabPacket() {
+            if (gameState.remainingCount === 0) {
+                return;
+            }
+
+            const redPacket = document.getElementById('redPacket');
+            if (redPacket.classList.contains('opened')) {
+                return;
+            }
+
+            const amount = gameState.packets[gameState.grabbed.length];
+            const grabInfo = {
+                name: gameState.userName,
+                amount: amount,
+                time: new Date().toLocaleTimeString(),
+                order: gameState.grabbed.length + 1
+            };
+
+            gameState.grabbed.push(grabInfo);
+            gameState.remainingAmount -= amount;
+            gameState.remainingCount--;
+
+            // 更新红包状态
+            redPacket.classList.add('opened');
+            redPacket.innerHTML = `
+                <div class="packet-icon">💰</div>
+                <div class="packet-title">已领取</div>
+                <div class="grab-result">
+                    <div>你抢到了</div>
+                    <div class="grab-amount">¥${amount.toFixed(2)}</div>
+                </div>
+            `;
+
+            // 更新个人信息
+            document.getElementById('myAmount').textContent = amount.toFixed(2);
+            document.getElementById('myRank').textContent = `第${grabInfo.order}个抢到`;
+
+            updateDisplay();
+            addSystemMessage(`${gameState.userName} 抢到了 ¥${amount.toFixed(2)}`);
+
+            checkGameEnd();
+        }
+
+        // 模拟机器人抢红包
+        function simulateBotGrabbing() {
+            const delay = Math.random() * 2000 + 1000; // 1-3秒随机延迟
+            
             setTimeout(() => {
-                // 开启动画
-                wrapper.classList.add('opening');
-                createCoins();
+                if (gameState.remainingCount > 0 && gameState.grabbed.length < gameState.totalCount) {
+                    // 检查用户是否已抢
+                    const userGrabbed = gameState.grabbed.some(g => g.name === gameState.userName);
+                    
+                    // 如果用户还没抢，有30%概率让机器人抢
+                    if (!userGrabbed && Math.random() > 0.3) {
+                        simulateBotGrabbing();
+                        return;
+                    }
 
-                setTimeout(() => {
-                    const amount = generateAmount();
-                    updateStats(amount);
-                    showResult(amount);
-                }, 600);
-            }, 500);
+                    const botName = botNames[Math.floor(Math.random() * botNames.length)];
+                    const amount = gameState.packets[gameState.grabbed.length];
+                    
+                    const grabInfo = {
+                        name: botName,
+                        amount: amount,
+                        time: new Date().toLocaleTimeString(),
+                        order: gameState.grabbed.length + 1
+                    };
+
+                    gameState.grabbed.push(grabInfo);
+                    gameState.remainingAmount -= amount;
+                    gameState.remainingCount--;
+
+                    addSystemMessage(`${botName} 抢到了 ¥${amount.toFixed(2)}`);
+                    updateDisplay();
+
+                    if (gameState.remainingCount > 0) {
+                        simulateBotGrabbing();
+                    } else {
+                        checkGameEnd();
+                    }
+                }
+            }, delay);
+        }
+
+        // 检查游戏结束
+        function checkGameEnd() {
+            if (gameState.remainingCount === 0) {
+                setTimeout(showResults, 1000);
+            }
         }
 
         // 显示结果
-        function showResult(amount) {
-            document.getElementById('amount').textContent = amount;
-            document.getElementById('message').textContent = getMessage(parseFloat(amount));
-            document.getElementById('resultModal').classList.add('show');
+        function showResults() {
+            const sorted = [...gameState.grabbed].sort((a, b) => b.amount - a.amount);
+            const best = sorted[0];
+            const worst = sorted[sorted.length - 1];
+
+            document.getElementById('bestAmount').textContent = best.amount.toFixed(2);
+            document.getElementById('bestName').textContent = best.name;
+            document.getElementById('worstAmount').textContent = worst.amount.toFixed(2);
+            document.getElementById('worstName').textContent = worst.name;
+
+            const rankingBody = document.getElementById('rankingBody');
+            rankingBody.innerHTML = '';
+
+            sorted.forEach((item, index) => {
+                const row = document.createElement('tr');
+                let medal = '';
+                if (index === 0) medal = '<span class="rank-medal">🥇</span>';
+                else if (index === 1) medal = '<span class="rank-medal">🥈</span>';
+                else if (index === 2) medal = '<span class="rank-medal">🥉</span>';
+                
+                row.innerHTML = `
+                    <td>${medal}${index + 1}</td>
+                    <td><strong>${item.name}</strong></td>
+                    <td style="color: #ff6b6b; font-weight: bold;">¥${item.amount.toFixed(2)}</td>
+                    <td>${item.time}</td>
+                `;
+                rankingBody.appendChild(row);
+            });
+
+            document.getElementById('resultPanel').classList.add('show');
+            
+            // 滚动到结果区域
+            setTimeout(() => {
+                document.getElementById('resultPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
 
-        // 关闭弹窗
-        function closeModal() {
-            document.getElementById('resultModal').classList.remove('show');
-            const wrapper = document.getElementById('redPacket');
-            wrapper.classList.remove('opening');
+        // 重置游戏
+        function resetGame() {
+            document.getElementById('setupPanel').classList.remove('hidden');
+            document.getElementById('gameArea').classList.add('hidden');
+            document.getElementById('resultPanel').classList.remove('show');
+            document.getElementById('chatMessages').innerHTML = '';
+            document.getElementById('myAmount').textContent = '0.00';
+            document.getElementById('myRank').textContent = '-';
         }
-
-        // 事件监听
-        document.getElementById('redPacket').addEventListener('click', openRedPacket);
-
-        // 初始化
-        createParticles();
     </script>
 </body>
 </html>
