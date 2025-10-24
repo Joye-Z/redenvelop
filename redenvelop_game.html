@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抢红包游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .game-container {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .title {
+            color: #fff;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .red-packet-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .red-packet-wrapper:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .red-packet-wrapper.shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(-10px) rotate(-5deg); }
+            75% { transform: translateX(10px) rotate(5deg); }
+        }
+
+        .red-packet {
+            width: 200px;
+            height: 240px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .red-packet::before {
+            content: '';
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: #ffd700;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        .red-packet::after {
+            content: '恭喜发财';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffd700;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .packet-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: linear-gradient(135deg, #ff8e53 0%, #fe6b8b 100%);
+            border-radius: 20px 20px 0 0;
+            z-index: 2;
+            transition: all 0.5s ease;
+        }
+
+        .red-packet-wrapper.opening .packet-top {
+            transform: translateY(-60px) rotateX(45deg);
+            opacity: 0;
+        }
+
+        .red-packet-wrapper.opening .red-packet {
+            animation: openPacket 0.5s ease forwards;
+        }
+
+        @keyframes openPacket {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1.1); opacity: 0.5; }
+        }
+
+        /* 金币动画 */
+        .coin {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.6);
+            opacity: 0;
+            z-index: 10;
+        }
+
+        .coin::before {
+            content: '¥';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff6b6b;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        @keyframes coinFly {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(var(--tx), var(--ty)) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), calc(var(--ty) + 100px)) scale(0.5);
+            }
+        }
+
+        /* 结果弹窗 */
+        .result-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .result-modal.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .result-content {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            animation: scaleIn 0.4s ease;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        @keyframes scaleIn {
+            from { 
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            to { 
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .result-title {
+            color: #ffd700;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .result-amount {
+            color: #fff;
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin: 1.5rem 0;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: numberPop 0.6s ease;
+        }
+
+        @keyframes numberPop {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .result-message {
+            color: #fff;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .btn {
+            background: #ffd700;
+            color: #ff6b6b;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* 统计信息 */
+        .stats {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            color: #fff;
+            text-align: left;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .stats h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .stats p {
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        /* 背景粒子效果 */
+        .particle {
+            position: absolute;
+            background: rgba(255, 215, 0, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .hint {
+            color: #fff;
+            font-size: 1.2rem;
+            margin-top: 2rem;
+            opacity: 0.8;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="title">🧧 春节抢红包 🧧</h1>
+        
+        <div class="red-packet-wrapper" id="redPacket">
+            <div class="packet-top"></div>
+            <div class="red-packet"></div>
+        </div>
+
+        <p class="hint">点击红包,试试手气!</p>
+    </div>
+
+    <div class="stats">
+        <h3>📊 统计信息</h3>
+        <p>已抢次数: <strong><span id="totalCount">0</span></strong></p>
+        <p>累计金额: <strong>¥<span id="totalAmount">0.00</span></strong></p>
+        <p>最大金额: <strong>¥<span id="maxAmount">0.00</span></strong></p>
+    </div>
+
+    <div class="result-modal" id="resultModal">
+        <div class="result-content">
+            <div class="result-title">🎉 恭喜发财 🎉</div>
+            <div class="result-amount">¥<span id="amount">0.00</span></div>
+            <div class="result-message" id="message">大吉大利!</div>
+            <button class="btn" onclick="closeModal()">再抢一个</button>
+        </div>
+    </div>
+
+    <script>
+        let totalCount = 0;
+        let totalAmount = 0;
+        let maxAmount = 0;
+
+        // 生成背景粒子
+        function createParticles() {
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = Math.random() * 10 + 5 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 4 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                document.body.appendChild(particle);
+            }
+        }
+
+        // 生成随机金额
+        function generateAmount() {
+            const rand = Math.random();
+            if (rand < 0.5) {
+                return (Math.random() * 2 + 0.01).toFixed(2); // 0.01-2元 (50%)
+            } else if (rand < 0.85) {
+                return (Math.random() * 18 + 2).toFixed(2); // 2-20元 (35%)
+            } else if (rand < 0.97) {
+                return (Math.random() * 80 + 20).toFixed(2); // 20-100元 (12%)
+            } else {
+                return (Math.random() * 100 + 100).toFixed(2); // 100-200元 (3%)
+            }
+        }
+
+        // 获取祝福语
+        function getMessage(amount) {
+            if (amount >= 100) return '💰 恭喜发大财!手气爆棚!';
+            if (amount >= 50) return '🎊 运气超好!再接再厉!';
+            if (amount >= 10) return '✨ 手气不错!继续加油!';
+            if (amount >= 1) return '🍀 小有收获!祝你好运!';
+            return '🌟 聚沙成塔!下次更好!';
+        }
+
+        // 创建金币动画
+        function createCoins() {
+            const packet = document.getElementById('redPacket');
+            const rect = packet.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            for (let i = 0; i < 15; i++) {
+                const coin = document.createElement('div');
+                coin.className = 'coin';
+                coin.style.left = centerX + 'px';
+                coin.style.top = centerY + 'px';
+                
+                const angle = (Math.PI * 2 * i) / 15;
+                const distance = 150 + Math.random() * 100;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                
+                coin.style.setProperty('--tx', tx + 'px');
+                coin.style.setProperty('--ty', ty + 'px');
+                coin.style.animation = `coinFly ${0.8 + Math.random() * 0.4}s ease-out forwards`;
+                coin.style.animationDelay = (Math.random() * 0.2) + 's';
+                
+                document.body.appendChild(coin);
+                
+                setTimeout(() => coin.remove(), 1500);
+            }
+        }
+
+        // 更新统计信息
+        function updateStats(amount) {
+            totalCount++;
+            totalAmount += parseFloat(amount);
+            if (parseFloat(amount) > maxAmount) {
+                maxAmount = parseFloat(amount);
+            }
+
+            document.getElementById('totalCount').textContent = totalCount;
+            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+            document.getElementById('maxAmount').textContent = maxAmount.toFixed(2);
+        }
+
+        // 打开红包
+        function openRedPacket() {
+            const wrapper = document.getElementById('redPacket');
+            if (wrapper.classList.contains('opening')) return;
+
+            // 抖动效果
+            wrapper.classList.add('shake');
+            setTimeout(() => wrapper.classList.remove('shake'), 500);
+
+            setTimeout(() => {
+                // 开启动画
+                wrapper.classList.add('opening');
+                createCoins();
+
+                setTimeout(() => {
+                    const amount = generateAmount();
+                    updateStats(amount);
+                    showResult(amount);
+                }, 600);
+            }, 500);
+        }
+
+        // 显示结果
+        function showResult(amount) {
+            document.getElementById('amount').textContent = amount;
+            document.getElementById('message').textContent = getMessage(parseFloat(amount));
+            document.getElementById('resultModal').classList.add('show');
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('resultModal').classList.remove('show');
+            const wrapper = document.getElementById('redPacket');
+            wrapper.classList.remove('opening');
+        }
+
+        // 事件监听
+        document.getElementById('redPacket').addEventListener('click', openRedPacket);
+
+        // 初始化
+        createParticles();
+    </script>
+</body>
+</html>
