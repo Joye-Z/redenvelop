@@ -90,6 +90,110 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        /* 红包皮肤选择 */
+        .skin-section {
+            margin: 2rem 0;
+        }
+
+        .skin-section h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .skin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .skin-card {
+            background: #fff;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .skin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .skin-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+
+        .skin-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 25px;
+            height: 25px;
+            background: #667eea;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .skin-preview {
+            width: 80px;
+            height: 100px;
+            margin: 0 auto 0.8rem;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skin-preview.normal {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        }
+
+        .skin-preview.birthday {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .skin-preview.spring {
+            background: linear-gradient(135deg, #ff0000 0%, #ff6b00 100%);
+        }
+
+        .skin-preview.valentine {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+        }
+
+        .skin-preview.christmas {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+        }
+
+        .skin-preview.lucky {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        }
+
+        .skin-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.3rem;
+        }
+
+        .skin-desc {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
@@ -238,51 +342,113 @@
         }
 
         .red-packet-msg {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-            padding: 1rem;
-            border-radius: 10px;
+            padding: 1.2rem;
+            border-radius: 12px;
             color: #fff;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .red-packet-msg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: shine 3s ease-in-out infinite;
+        }
+
+        @keyframes shine {
+            0%, 100% { transform: translate(-50%, -50%); }
+            50% { transform: translate(0, 0); }
         }
 
         .red-packet-msg:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.5);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
 
         .red-packet-msg.opened {
-            background: linear-gradient(135deg, #ccc 0%, #999 100%);
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%) !important;
             cursor: not-allowed;
-            opacity: 0.6;
+            opacity: 0.7;
+        }
+
+        .red-packet-msg.opened::before {
+            display: none;
+        }
+
+        /* 不同皮肤样式 */
+        .red-packet-msg.normal {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        }
+
+        .red-packet-msg.birthday {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .red-packet-msg.spring {
+            background: linear-gradient(135deg, #ff0000 0%, #ff6b00 100%);
+        }
+
+        .red-packet-msg.valentine {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+        }
+
+        .red-packet-msg.christmas {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+        }
+
+        .red-packet-msg.lucky {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
         }
 
         .packet-icon {
-            font-size: 2rem;
+            font-size: 2.5rem;
             margin-bottom: 0.5rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
 
         .packet-title {
             font-weight: bold;
-            margin-bottom: 0.3rem;
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
 
         .packet-info {
             font-size: 0.9rem;
-            opacity: 0.9;
+            opacity: 0.95;
+        }
+
+        .packet-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.3);
+            backdrop-filter: blur(5px);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
         }
 
         .grab-result {
-            background: #fff3cd;
-            padding: 0.8rem;
-            border-radius: 8px;
-            margin-top: 0.5rem;
+            background: rgba(255,255,255,0.95);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 0.8rem;
             border-left: 4px solid #ffc107;
+            color: #333;
         }
 
         .grab-amount {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #ff6b6b;
             margin: 0.5rem 0;
@@ -355,6 +521,18 @@
         .stat-value.highlight {
             color: #ff6b6b;
             font-size: 1.2rem;
+        }
+
+        .skin-display {
+            text-align: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .skin-display .skin-preview {
+            margin: 0 auto 0.5rem;
         }
 
         /* 最终结果面板 */
@@ -496,7 +674,7 @@
     <div class="container">
         <div class="header">
             <h1>🧧 群聊抢红包游戏 🧧</h1>
-            <p>模拟真实微信群抢红包场景</p>
+            <p>模拟真实微信群抢红包场景 - 多种皮肤可选</p>
         </div>
 
         <!-- 游戏设置 -->
@@ -516,6 +694,44 @@
                     <input type="text" id="userName" value="我" maxlength="10">
                 </div>
             </div>
+
+            <!-- 红包皮肤选择 -->
+            <div class="skin-section">
+                <h3>🎨 选择红包皮肤</h3>
+                <div class="skin-grid">
+                    <div class="skin-card selected" data-skin="normal">
+                        <div class="skin-preview normal">🧧</div>
+                        <div class="skin-name">经典红包</div>
+                        <div class="skin-desc">传统中国红</div>
+                    </div>
+                    <div class="skin-card" data-skin="birthday">
+                        <div class="skin-preview birthday">🎂</div>
+                        <div class="skin-name">生日红包</div>
+                        <div class="skin-desc">生日快乐</div>
+                    </div>
+                    <div class="skin-card" data-skin="spring">
+                        <div class="skin-preview spring">🎆</div>
+                        <div class="skin-name">春节红包</div>
+                        <div class="skin-desc">新春大吉</div>
+                    </div>
+                    <div class="skin-card" data-skin="valentine">
+                        <div class="skin-preview valentine">💕</div>
+                        <div class="skin-name">情人节</div>
+                        <div class="skin-desc">甜蜜浪漫</div>
+                    </div>
+                    <div class="skin-card" data-skin="christmas">
+                        <div class="skin-preview christmas">🎄</div>
+                        <div class="skin-name">圣诞节</div>
+                        <div class="skin-desc">圣诞快乐</div>
+                    </div>
+                    <div class="skin-card" data-skin="lucky">
+                        <div class="skin-preview lucky">🍀</div>
+                        <div class="skin-name">幸运红包</div>
+                        <div class="skin-desc">好运连连</div>
+                    </div>
+                </div>
+            </div>
+
             <button class="btn-primary" onclick="startGame()">🚀 发红包</button>
         </div>
 
@@ -533,6 +749,14 @@
 
             <!-- 信息面板 -->
             <div class="info-panel">
+                <div class="info-card">
+                    <h3>🎨 当前皮肤</h3>
+                    <div class="skin-display" id="currentSkin">
+                        <div class="skin-preview normal">🧧</div>
+                        <div class="skin-name">经典红包</div>
+                    </div>
+                </div>
+
                 <div class="info-card">
                     <h3>📊 抢红包进度</h3>
                     <div class="progress-bar">
@@ -613,11 +837,30 @@
             packets: [],
             grabbed: [],
             userName: '我',
-            currentPacketId: null
+            currentPacketId: null,
+            selectedSkin: 'normal'
         };
 
         const botNames = ['小明', '小红', '小刚', '小丽', '大熊', '静香', '胖虎', '小夫', '张三', '李四', 
                          '王五', '赵六', '钱七', '孙八', '周九', '吴十', '郑一', '冯二', '陈三', '褚四'];
+
+        const skinData = {
+            normal: { icon: '🧧', name: '经典红包', desc: '传统中国红', message: '恭喜发财，大吉大利' },
+            birthday: { icon: '🎂', name: '生日红包', desc: '生日快乐', message: '🎂 生日快乐，越活越年轻' },
+            spring: { icon: '🎆', name: '春节红包', desc: '新春大吉', message: '🎆 新春快乐，万事如意' },
+            valentine: { icon: '💕', name: '情人节', desc: '甜蜜浪漫', message: '💕 情人节快乐，甜甜蜜蜜' },
+            christmas: { icon: '🎄', name: '圣诞节', desc: '圣诞快乐', message: '🎄 圣诞快乐，平安喜乐' },
+            lucky: { icon: '🍀', name: '幸运红包', desc: '好运连连', message: '🍀 好运连连，财源滚滚' }
+        };
+
+        // 皮肤选择
+        document.querySelectorAll('.skin-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.skin-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                gameState.selectedSkin = this.dataset.skin;
+            });
+        });
 
         // 生成随机红包金额（微信红包算法）
         function generatePackets(total, count) {
@@ -665,7 +908,8 @@
                 packets: generatePackets(total, count),
                 grabbed: [],
                 userName: userName,
-                currentPacketId: Date.now()
+                currentPacketId: Date.now(),
+                selectedSkin: gameState.selectedSkin
             };
 
             document.getElementById('setupPanel').classList.add('hidden');
@@ -673,11 +917,22 @@
             document.getElementById('resultPanel').classList.remove('show');
 
             updateDisplay();
+            updateSkinDisplay();
             addSystemMessage(`${userName} 发了一个红包`);
             addRedPacketMessage();
             
             // 模拟其他人抢红包
             simulateBotGrabbing();
+        }
+
+        // 更新皮肤显示
+        function updateSkinDisplay() {
+            const skin = skinData[gameState.selectedSkin];
+            const skinDisplay = document.getElementById('currentSkin');
+            skinDisplay.innerHTML = `
+                <div class="skin-preview ${gameState.selectedSkin}">${skin.icon}</div>
+                <div class="skin-name">${skin.name}</div>
+            `;
         }
 
         // 更新显示
@@ -707,6 +962,7 @@
         // 添加红包消息
         function addRedPacketMessage() {
             const chatMessages = document.getElementById('chatMessages');
+            const skin = skinData[gameState.selectedSkin];
             const message = document.createElement('div');
             message.className = 'message user';
             message.innerHTML = `
@@ -715,9 +971,10 @@
                         <div class="avatar">${gameState.userName[0]}</div>
                         <span class="username">${gameState.userName}</span>
                     </div>
-                    <div class="red-packet-msg" id="redPacket" onclick="grabPacket()">
-                        <div class="packet-icon">🧧</div>
-                        <div class="packet-title">恭喜发财，大吉大利</div>
+                    <div class="red-packet-msg ${gameState.selectedSkin}" id="redPacket" onclick="grabPacket()">
+                        <div class="packet-badge">${skin.name}</div>
+                        <div class="packet-icon">${skin.icon}</div>
+                        <div class="packet-title">${skin.message}</div>
                         <div class="packet-info">共${gameState.totalCount}个红包，金额随机</div>
                     </div>
                 </div>
@@ -749,14 +1006,17 @@
             gameState.remainingAmount -= amount;
             gameState.remainingCount--;
 
+            const skin = skinData[gameState.selectedSkin];
+            
             // 更新红包状态
             redPacket.classList.add('opened');
             redPacket.innerHTML = `
-                <div class="packet-icon">💰</div>
+                <div class="packet-icon">${skin.icon}</div>
                 <div class="packet-title">已领取</div>
                 <div class="grab-result">
-                    <div>你抢到了</div>
+                    <div>🎉 你抢到了</div>
                     <div class="grab-amount">¥${amount.toFixed(2)}</div>
+                    <div style="font-size: 0.9rem; color: #666; margin-top: 0.3rem;">快去看看大家抢了多少</div>
                 </div>
             `;
 
